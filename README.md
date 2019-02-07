@@ -1,68 +1,81 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# A brief introduction to React Hooks
 
-## Available Scripts
+To write a React component you have (more or less) two options - functional components and class components.
 
-In the project directory, you can run:
+Functional components are typically a pure function of their props, and are normally what we would consider presentational components. They have no state or lifecycle methods. They should be considered the default way to create a React component. Also, they're really easy to test (you can pass different props and take snapshots).
 
-### `npm start`
+Sometimes you need to store some state in your component, so you convert your functional component into a class component. Now, you have all these lifecycle methods, which then get deprecated (e.g. componentWillReceiveProps), it's a lot more complex to test and they're generally less fun.
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+React Hooks let you add state and other features to your functional components without having to write a class! This is awesome.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+## Built-in hooks
 
-### `npm test`
+React comes with some built-in hooks. By convention all hooks are prefixed with `use`. The built-in hooks are:
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- `useState`
+- `useEffect`
+- `useContext`
+- `useReducer`
 
-### `npm run build`
+We'll focus on the first two of these.
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### useState
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+useState lets you add state to a component. Here is a boring example of a counter.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+function Example() {
+  // Declare a new state variable, which we'll call "count"
+  const [count, setCount] = useState(0);
 
-### `npm run eject`
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>
+        Click me
+      </button>
+    </div>
+  );
+}
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+You can declare multiple useStates in a single component. 
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### useEffect
+You’ve likely performed data fetching, subscriptions, or manually changing the DOM from React components before. We call these operations “side effects” (or “effects” for short) because they can affect other components and can’t be done during rendering.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+The Effect Hook, useEffect, adds the ability to perform side effects from a function component. It serves the same purpose as componentDidMount, componentDidUpdate, and componentWillUnmount in React classes, but unified into a single API. 
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```
+import React, { useState, useEffect } from 'react';
 
-## Learn More
+function FriendListItem(props) {
+  const [isOnline, setIsOnline] = useState(null);
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  function handleStatusChange(status) {
+    setIsOnline(status.isOnline);
+  }
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+  useEffect(() => {
+    ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+    return () => {
+      ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+    };
+  });
 
-### Code Splitting
+  return (
+    <li style={{ color: isOnline ? 'green' : 'black' }}>
+      {props.friend.name}
+    </li>
+  );
+}
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+In this example, useEffect returns a function that can be used to clean up the side effect. Here it is used to unsubscribe from an API, but you would also use it to remove event listeners, for example.
 
-### Analyzing the Bundle Size
+## Custom Hooks
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+We can also write custom hooks, which is very cool. Let's look at an example that uses the width of the window.
 
-### Making a Progressive Web App
+Because of the nature of hooks - they're reusable bits of logic that everyone keeps writing over and over again - there are already LOADS of examples published on GitHub, like those found [here](https://github.com/streamich/react-use), which *hook* into all sorts of browser APIs and provide for other common use cases.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify

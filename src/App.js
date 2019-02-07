@@ -1,28 +1,38 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component, useState, useEffect, useRef } from "react"
+import { useWindowWidth, useComponentSize } from "./hooks"
+import "./App.css"
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+	render() {
+		return (
+			<div className="App">
+				<MyResponsiveComponent />
+				<Example />
+			</div>
+		)
+	}
 }
 
-export default App;
+export default App
+
+function MyResponsiveComponent() {
+	const width = useWindowWidth() // Our custom Hook
+	return <p>Window width is {width}</p>
+}
+
+function Example() {
+	// Declare a new state variable, which we'll call "count"
+	const [count, setCount] = useState(0)
+	// Similar to componentDidMount and componentDidUpdate:
+	useEffect(() => {
+		// Update the document title using the browser API
+		document.title = `You clicked ${count} times`
+	})
+
+	return (
+		<div>
+			<p>You clicked {count} times</p>
+			<button onClick={() => setCount(count + 1)}>Click me</button>
+		</div>
+	)
+}
